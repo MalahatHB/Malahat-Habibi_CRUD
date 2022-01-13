@@ -3,7 +3,6 @@
 namespace CRUD\Helper;
 
 use CRUD\Model\Person;
-use mysqli;
 
 class PersonHelper
 {
@@ -20,9 +19,14 @@ class PersonHelper
         $connect = new DBConnector($this->db, $this->server, $this->username, $this->password);
         $connect->connect();
         $sql = "INSERT INTO person (first_name, last_name, user_name) VALUES ('".$person->getFirstName()."', '".$person->getLastName()."', '".$person->getUsername()."')";
-        echo $sql;
+//        echo $sql;
         $connect->execQuery($sql);
-        echo "Success";
+        if ($connect){
+            echo "Insert was successful!";
+        } else{
+            echo "Insert was not successful!";
+        }
+
     }
 
     public function fetch(int $id)
@@ -31,44 +35,52 @@ class PersonHelper
         $connect->connect();
         $sql = "SELECT * FROM person WHERE id = " . $id;
         $temp = $connect->execQuery($sql);
-        echo json_encode($temp->fetchAll());
-
-
-//        echo "First name: ".$person->getFirstName()." Last name: ".$person->getLastName()." Username: ".$person->getUsername();
-
-
+        $data = json_encode($temp->fetchAll());
+        if ($data){
+            echo $data;
+        } else{
+            echo "The user was not found!";
+        }
     }
 
     public function fetchAll()
     {
         $connect = new DBConnector($this->db, $this->server, $this->username, $this->password);
+        $connect->connect();
         $sql = "SELECT * FROM person";
-
-
+        $temp = $connect->execQuery($sql);
+        $data = json_encode($temp->fetchAll());
+        if ($data){
+            echo $data;
+        } else{
+            echo "No users found!";
+        }
     }
 
     public function update($person)
     {
         $connect = new DBConnector($this->db, $this->server, $this->username, $this->password);
-
-        if ($connect->connect_error) {
-            die("Connection failed: " . $connect->connect_error);
+        $connect->connect();
+        $sql = "UPDATE person SET first_name = '".$person->getFirstName()."', last_name = '".$person->getLastName()."' WHERE user_name = '".$person->getUsername()."'";
+        $connect->execQuery($sql);
+        if ($connect){
+            echo "Update was successful!";
+        } else{
+            echo "Update was not successful!";
         }
-
-//        $sql = "UPDATE person SET first_name = '$firstname', last_name = '$lastname' WHERE user_name = '$username'";
-
-//        if ($connect->query($sql) === TRUE) {
-//            echo "Record updated successfully";
-//        } else {
-//            echo "Error updating record: " . $connect->error;
-//        }
-
-        $connect->close();
     }
 
     public function delete($username)
     {
-
+        $connect = new DBConnector($this->db, $this->server, $this->username, $this->password);
+        $connect->connect();
+        $sql = "DELETE FROM person WHERE user_name = '$username'";
+        $connect->execQuery($sql);
+        if ($connect){
+            echo "User deleted successfully!";
+        } else{
+            echo "Delete was not successful!";
+        }
     }
 
 }
